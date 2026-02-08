@@ -4,9 +4,15 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use crate::infrastructure::errors::AppError;
 
+use crate::domain::entities::user::{User, Role};
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
     pub sub: Uuid,
+    pub name: String,
+    pub email: String,
+    pub phone: Option<String>,
+    pub role: Role,
     pub exp: usize,
     pub iat: usize,
     pub token_type: String, // "access" or "refresh"
@@ -21,14 +27,18 @@ impl JwtService {
         Self { secret }
     }
 
-    pub fn generate_tokens(&self, user_id: Uuid) -> Result<(String, String), AppError> {
+    pub fn generate_tokens(&self, user: &User) -> Result<(String, String), AppError> {
         let now = Utc::now();
         let iat = now.timestamp() as usize;
 
         // Access Token (15 minutes)
         let exp_access = (now + Duration::minutes(15)).timestamp() as usize;
         let access_claims = Claims {
-            sub: user_id,
+            sub: user.id,
+            name: user.name.clone(),
+            email: user.email.clone(),
+            phone: user.phone.clone(),
+            role: user.role.clone(),
             exp: exp_access,
             iat,
             token_type: "access".to_string(),
@@ -42,7 +52,11 @@ impl JwtService {
         // Refresh Token (7 days)
         let exp_refresh = (now + Duration::days(7)).timestamp() as usize;
         let refresh_claims = Claims {
-            sub: user_id,
+            sub: user.id,
+            name: user.name.clone(),
+            email: user.email.clone(),
+            phone: user.phone.clone(),
+            role: user.role.clone(),
             exp: exp_refresh,
             iat,
             token_type: "refresh".to_string(),

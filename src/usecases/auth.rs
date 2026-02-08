@@ -65,7 +65,7 @@ impl<R: UserRepository> LoginUseCase<R> {
             return Err(AppError::InvalidCredentials);
         }
 
-        let (access_token, refresh_token) = self.jwt_service.generate_tokens(user.id)?;
+        let (access_token, refresh_token) = self.jwt_service.generate_tokens(&user)?;
 
         Ok(AuthResponseDto {
             access_token,
@@ -98,7 +98,7 @@ impl<R: UserRepository> RefreshTokenUseCase<R> {
             .await?
             .ok_or(AppError::UserNotFound)?;
 
-        let (access_token, refresh_token) = self.jwt_service.generate_tokens(user.id)?;
+        let (access_token, refresh_token) = self.jwt_service.generate_tokens(&user)?;
 
         Ok(AuthResponseDto {
             access_token,
