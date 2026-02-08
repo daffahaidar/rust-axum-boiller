@@ -1,0 +1,78 @@
+mod config;
+mod domain;
+mod handlers;
+mod infrastructure;
+mod routes;
+mod usecases;
+mod utils; // created folder but empty, declaring mod here to avoid confusion if user adds files later. 
+           // Wait, if folder is empty and no mod.rs, this will fail.
+           // I'll skip declaring utils mod since I haven't created utils/mod.rs.
+
+use axum::http::Method;
+use dotenvy::dotenv;
+use std::env;
+use std::net::SocketAddr;
+use std::sync::Arc;
+use tower_http::cors::{Any, CorsLayer};
+use tower_http::trace::TraceLayer;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
+use crate::infrastructure::auth::jwt::JwtService;
+use crate::infrastructure::database::postgres::Database;
+use crate::infrastructure::repositories::postgres_user_repository::PostgresUserRepository;
+
+#[derive(Clone)]
+pub struct AppState {
+    pub user_repository: Arc<PostgresUserRepository>,
+    pub jwt_service: Arc<JwtService>,
+}
+
+#[tokio::main]
+async fn main() {
+    dotenv().ok();
+
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "rust_axum=debug,tower_http=debug".into()),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+
+    let db = Database::new(&database_url).await.expect("Failed to connect to database");
+
+    sqlx::migrate!("./migrations")
+        .run(&db.pool)
+        .await
+        .expect("Failed to run migrations");
+
+    let user_repository = Arc::new(PostgresUserRepository::new(db.pool.clone()));
+    let jwt_service = Arc::new(JwtService::new(jwt_secret));
+
+    let state = AppState {
+        user_repository,
+        jwt_service,
+    };
+
+    let api_routes = routes::api::create_router();
+    
+    let app = axum::Router::new()
+        .nest("/api/v1", api_routes)
+        .layer(
+            CorsLayer::new()
+                .allow_origin(Any)
+                .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+                .allow_headers(Any),
+        )
+        .layer(TraceLayer::new_for_http())
+        .with_state(state);
+
+    let address = SocketAddr::from(([127, 0, 0, 1], 8000));
+    tracing::info!("Server listening on {}", address);
+
+    let listener = tokio::net::TcpListener::bind(address).await.unwrap();
+    axum::serve(listener, app).await.unwrap();
+}
