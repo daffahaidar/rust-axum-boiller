@@ -31,9 +31,11 @@ pub struct User {
     pub phone: Option<String>,
     pub email: String,
     #[serde(skip_serializing)]
-    pub password_hash: String,
+    pub password_hash: Option<String>,
     pub role: Role,
     pub status: UserStatus,
+    pub github_id: Option<i64>,
+    pub avatar_url: Option<String>,
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
 }

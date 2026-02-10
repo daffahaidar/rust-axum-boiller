@@ -4,9 +4,7 @@ mod handlers;
 mod infrastructure;
 mod routes;
 mod usecases;
-mod utils; // created folder but empty, declaring mod here to avoid confusion if user adds files later. 
-           // Wait, if folder is empty and no mod.rs, this will fail.
-           // I'll skip declaring utils mod since I haven't created utils/mod.rs.
+mod utils;
 
 use axum::http::Method;
 use dotenvy::dotenv;
@@ -18,6 +16,7 @@ use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::infrastructure::auth::jwt::JwtService;
+use crate::infrastructure::auth::github::GitHubOAuthClient;
 use crate::infrastructure::database::postgres::Database;
 use crate::infrastructure::repositories::postgres_user_repository::PostgresUserRepository;
 
@@ -25,6 +24,7 @@ use crate::infrastructure::repositories::postgres_user_repository::PostgresUserR
 pub struct AppState {
     pub user_repository: Arc<PostgresUserRepository>,
     pub jwt_service: Arc<JwtService>,
+    pub github_oauth: Arc<GitHubOAuthClient>,
 }
 
 #[tokio::main]
@@ -41,6 +41,9 @@ async fn main() {
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let github_client_id = env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID must be set");
+    let github_client_secret = env::var("GITHUB_CLIENT_SECRET").expect("GITHUB_CLIENT_SECRET must be set");
+    let github_redirect_uri = env::var("GITHUB_REDIRECT_URI").expect("GITHUB_REDIRECT_URI must be set");
 
     let db = Database::new(&database_url).await.expect("Failed to connect to database");
 
@@ -51,10 +54,16 @@ async fn main() {
 
     let user_repository = Arc::new(PostgresUserRepository::new(db.pool.clone()));
     let jwt_service = Arc::new(JwtService::new(jwt_secret));
+    let github_oauth = Arc::new(GitHubOAuthClient::new(
+        github_client_id,
+        github_client_secret,
+        github_redirect_uri,
+    ));
 
     let state = AppState {
         user_repository,
         jwt_service,
+        github_oauth,
     };
 
     let api_routes = routes::api::create_router();

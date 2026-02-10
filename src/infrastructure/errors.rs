@@ -30,6 +30,8 @@ pub enum AppError {
     Forbidden,
     #[error("Cannot delete your own account")]
     CannotDeleteSelf,
+    #[error("OAuth error: {0}")]
+    OAuthError(String),
 }
 
 impl IntoResponse for AppError {
@@ -49,6 +51,10 @@ impl IntoResponse for AppError {
             AppError::InternalServerError => (StatusCode::INTERNAL_SERVER_ERROR, "Internal server error".to_string()),
             AppError::Forbidden => (StatusCode::FORBIDDEN, "Forbidden".to_string()),
             AppError::CannotDeleteSelf => (StatusCode::BAD_REQUEST, "Cannot delete your own account".to_string()),
+            AppError::OAuthError(msg) => {
+                tracing::error!("OAuth error: {}", msg);
+                (StatusCode::BAD_REQUEST, format!("OAuth error: {}", msg))
+            }
         };
 
         let body = Json(json!({

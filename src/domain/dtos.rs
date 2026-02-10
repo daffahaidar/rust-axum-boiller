@@ -8,6 +8,7 @@ pub struct UserResponseDto {
     pub phone: Option<String>,
     pub email: String,
     pub role: Role,
+    pub avatar_url: Option<String>,
 }
 
 /// Request DTO for user registration
@@ -51,4 +52,30 @@ pub struct UpdateUserDto {
 #[derive(Debug, Deserialize)]
 pub struct UpdateUserStatusDto {
     pub status: UserStatus,
+}
+
+/// GitHub user info from GitHub API
+#[derive(Debug, Deserialize)]
+pub struct GitHubUserInfo {
+    pub id: i64,
+    pub login: String,
+    pub name: Option<String>,
+    pub email: Option<String>,
+    pub avatar_url: Option<String>,
+}
+
+/// GitHub access token response
+#[derive(Debug, Deserialize)]
+pub struct GitHubTokenResponse {
+    pub access_token: String,
+    pub token_type: String,
+    pub scope: String,
+}
+
+/// GitHub email response (from /user/emails endpoint)
+#[derive(Debug, Deserialize)]
+pub struct GitHubEmail {
+    pub email: String,
+    pub primary: bool,
+    pub verified: bool,
 }

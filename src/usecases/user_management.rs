@@ -30,9 +30,11 @@ impl<R: UserRepository> CreateUserUseCase<R> {
             name: dto.name,
             phone: dto.phone,
             email: dto.email,
-            password_hash,
+            password_hash: Some(password_hash),
             role: dto.role,
             status: UserStatus::default(),
+            github_id: None,
+            avatar_url: None,
             created_at: None,
             updated_at: None,
         };
@@ -44,6 +46,7 @@ impl<R: UserRepository> CreateUserUseCase<R> {
             phone: created_user.phone,
             email: created_user.email,
             role: created_user.role,
+            avatar_url: created_user.avatar_url,
         })
     }
 }
@@ -91,6 +94,7 @@ impl<R: UserRepository> UpdateUserUseCase<R> {
             phone: updated_user.phone,
             email: updated_user.email,
             role: updated_user.role,
+            avatar_url: updated_user.avatar_url,
         })
     }
 }
@@ -152,6 +156,7 @@ impl<R: UserRepository> UpdateUserStatusUseCase<R> {
             phone: updated_user.phone,
             email: updated_user.email,
             role: updated_user.role,
+            avatar_url: updated_user.avatar_url,
         })
     }
 }

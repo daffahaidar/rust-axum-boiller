@@ -5,6 +5,7 @@ Backend REST API menggunakan Rust + Axum dengan arsitektur Clean Architecture. S
 ## 🚀 Features
 
 - ✅ User Registration & Login
+- ✅ **Login with GitHub (OAuth 2.0)**
 - ✅ JWT Access Token + Refresh Token
 - ✅ Role-Based Access Control (RBAC)
 - ✅ User Management (Create, Update, Delete, Suspend)
@@ -207,6 +208,11 @@ JWT_SECRET=supersecretkeyShouldChangeInProduction
 
 # Logging Level
 RUST_LOG=debug
+
+# GitHub OAuth (untuk Login with GitHub)
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+GITHUB_REDIRECT_URI=http://localhost:8000/api/v1/auth/github/callback
 ```
 
 **⚠️ SECURITY:** Jangan commit file `.env` ke Git!
@@ -263,18 +269,65 @@ Content-Type: application/json
 }
 ```
 
+### GitHub OAuth Endpoints
+
+![alt text](image.png)
+
+#### 4. Login with GitHub
+
+```bash
+GET /auth/github
+```
+
+Redirect user ke endpoint ini. Backend akan redirect ke halaman otorisasi GitHub.
+
+#### 5. GitHub Callback
+
+```bash
+GET /auth/github/callback?code={authorization_code}
+```
+
+Dipanggil otomatis oleh GitHub setelah user authorize. Mengembalikan JWT tokens.
+
+**Response:**
+
+```json
+{
+  "meta": {
+    "status": "success",
+    "message": "GitHub login successful"
+  },
+  "results": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "token_type": "Bearer",
+    "expires_in": 900
+  }
+}
+```
+
+**OAuth Flow:**
+
+```
+User → GET /auth/github → Redirect ke GitHub → User authorize
+→ GitHub redirect ke /auth/github/callback?code=xxx
+→ Backend exchange code → Fetch user info → Create/link user → Return JWT
+```
+
+> **📝 Note:** Jika email GitHub sudah terdaftar, akun akan otomatis di-link. User OAuth tidak bisa login via email/password.
+
 ### User Management Endpoints
 
 > **⚠️ Semua endpoint ini memerlukan Authorization header**
 
-#### 4. Get All Users (Admin, SuperAdmin)
+#### 6. Get All Users (Admin, SuperAdmin)
 
 ```bash
 GET /users
 Authorization: Bearer {access_token}
 ```
 
-#### 5. Create User (Admin, SuperAdmin)
+#### 7. Create User (Admin, SuperAdmin)
 
 ```bash
 POST /users
@@ -290,7 +343,7 @@ Content-Type: application/json
 }
 ```
 
-#### 6. Update User (SuperAdmin only)
+#### 8. Update User (SuperAdmin only)
 
 ```bash
 PUT /users/{id}
@@ -304,7 +357,7 @@ Content-Type: application/json
 }
 ```
 
-#### 7. Delete User (SuperAdmin only)
+#### 9. Delete User (SuperAdmin only)
 
 ```bash
 DELETE /users/{id}
@@ -313,7 +366,7 @@ Authorization: Bearer {access_token}
 
 **Note:** SuperAdmin tidak bisa menghapus akun mereka sendiri.
 
-#### 8. Suspend/Activate User (Admin, SuperAdmin)
+#### 10. Suspend/Activate User (Admin, SuperAdmin)
 
 ```bash
 PATCH /users/{id}/status
@@ -353,6 +406,16 @@ curl -X POST http://localhost:8000/api/v1/auth/sign-in \
   }'
 ```
 
+### Login with GitHub
+
+```bash
+# Buka URL ini di browser (akan redirect ke GitHub)
+curl -v http://localhost:8000/api/v1/auth/github
+
+# Atau langsung buka di browser:
+# http://localhost:8000/api/v1/auth/github
+```
+
 ### Get All Users
 
 ```bash
@@ -362,15 +425,16 @@ curl -X GET http://localhost:8000/api/v1/users \
 
 ## 📊 Access Control Matrix
 
-| Action         | User | Mentor | Admin | SuperAdmin |
-| -------------- | ---- | ------ | ----- | ---------- |
-| Register       | ✅   | ✅     | ✅    | ✅         |
-| Login          | ✅   | ✅     | ✅    | ✅         |
-| View All Users | ❌   | ❌     | ✅    | ✅         |
-| Create User    | ❌   | ❌     | ✅    | ✅         |
-| Edit User      | ❌   | ❌     | ❌    | ✅         |
-| Delete User    | ❌   | ❌     | ❌    | ✅\*       |
-| Suspend User   | ❌   | ❌     | ✅    | ✅         |
+| Action          | User | Mentor | Admin | SuperAdmin |
+| --------------- | ---- | ------ | ----- | ---------- |
+| Register        | ✅   | ✅     | ✅    | ✅         |
+| Login           | ✅   | ✅     | ✅    | ✅         |
+| Login w/ GitHub | ✅   | ✅     | ✅    | ✅         |
+| View All Users  | ❌   | ❌     | ✅    | ✅         |
+| Create User     | ❌   | ❌     | ✅    | ✅         |
+| Edit User       | ❌   | ❌     | ❌    | ✅         |
+| Delete User     | ❌   | ❌     | ❌    | ✅\*       |
+| Suspend User    | ❌   | ❌     | ✅    | ✅         |
 
 \*SuperAdmin tidak dapat menghapus akun mereka sendiri
 
@@ -388,7 +452,7 @@ rust-axum/
 │   ├── infrastructure/   # External dependencies
 │   │   ├── database/
 │   │   ├── repositories/
-│   │   ├── auth/         # JWT, Password
+│   │   ├── auth/         # JWT, Password, GitHub OAuth
 │   │   └── errors/
 │   ├── routes/           # Route configuration
 │   ├── utils/            # Helpers
@@ -435,11 +499,13 @@ cargo install cargo-watch
 
 1. ✅ Password Hashing - Argon2
 2. ✅ JWT Authentication - HS256
-3. ✅ Email Uniqueness - Database constraint
-4. ✅ RBAC - Endpoint-level authorization
-5. ✅ Input Validation - Request validation
-6. ✅ Self-Deletion Prevention
-7. ✅ Centralized Error Handling
+3. ✅ GitHub OAuth 2.0 - Secure third-party login
+4. ✅ Email Uniqueness - Database constraint
+5. ✅ RBAC - Endpoint-level authorization
+6. ✅ Input Validation - Request validation
+7. ✅ Self-Deletion Prevention
+8. ✅ Centralized Error Handling
+9. ✅ Account Linking - GitHub ↔ Email
 
 ## 📝 License
 

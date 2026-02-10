@@ -1,8 +1,8 @@
-use axum::{extract::State, response::IntoResponse, Json};
+use axum::{extract::{State, Query}, response::{IntoResponse, Redirect}, Json};
 use validator::Validate;
 use crate::infrastructure::errors::AppError;
 use crate::domain::dtos::RegisterUserDto;
-use crate::usecases::auth::{RegisterUseCase, LoginUseCase, RefreshTokenUseCase};
+use crate::usecases::auth::{RegisterUseCase, LoginUseCase, RefreshTokenUseCase, GitHubCallbackUseCase};
 use crate::utils::{response::success_response, validation::validate_request};
 use crate::AppState;
 
@@ -29,6 +29,11 @@ pub struct LoginRequest {
 #[derive(serde::Deserialize)]
 pub struct RefreshRequest {
     pub refresh_token: String,
+}
+
+#[derive(serde::Deserialize)]
+pub struct GitHubCallbackQuery {
+    pub code: String,
 }
 
 pub async fn sign_up(
@@ -70,4 +75,28 @@ pub async fn refresh(
     let tokens = usecase.execute(&payload.refresh_token).await?;
 
     Ok(success_response(tokens, "success"))
+}
+
+/// Redirects the user to GitHub's authorization page
+pub async fn github_login(
+    State(state): State<AppState>,
+) -> Redirect {
+    let authorize_url = state.github_oauth.get_authorize_url();
+    Redirect::temporary(&authorize_url)
+}
+
+/// Handles the GitHub OAuth callback
+pub async fn github_callback(
+    State(state): State<AppState>,
+    Query(query): Query<GitHubCallbackQuery>,
+) -> Result<impl IntoResponse, AppError> {
+    let usecase = GitHubCallbackUseCase::new(
+        state.user_repository.clone(),
+        state.jwt_service.clone(),
+        state.github_oauth.clone(),
+    );
+
+    let tokens = usecase.execute(&query.code).await?;
+
+    Ok(success_response(tokens, "GitHub login successful"))
 }

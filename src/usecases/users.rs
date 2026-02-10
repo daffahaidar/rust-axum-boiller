@@ -27,6 +27,7 @@ impl<R: UserRepository> GetUsersUseCase<R> {
             phone: u.phone,
             email: u.email,
             role: u.role,
+            avatar_url: u.avatar_url,
         }).collect();
 
         Ok(user_dtos)
