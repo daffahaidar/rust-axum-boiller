@@ -17,6 +17,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::infrastructure::auth::jwt::JwtService;
 use crate::infrastructure::auth::github::GitHubOAuthClient;
+use crate::infrastructure::auth::google::GoogleOAuthClient;
 use crate::infrastructure::database::postgres::Database;
 use crate::infrastructure::repositories::postgres_user_repository::PostgresUserRepository;
 
@@ -25,6 +26,7 @@ pub struct AppState {
     pub user_repository: Arc<PostgresUserRepository>,
     pub jwt_service: Arc<JwtService>,
     pub github_oauth: Arc<GitHubOAuthClient>,
+    pub google_oauth: Arc<GoogleOAuthClient>,
 }
 
 #[tokio::main]
@@ -44,6 +46,9 @@ async fn main() {
     let github_client_id = env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID must be set");
     let github_client_secret = env::var("GITHUB_CLIENT_SECRET").expect("GITHUB_CLIENT_SECRET must be set");
     let github_redirect_uri = env::var("GITHUB_REDIRECT_URI").expect("GITHUB_REDIRECT_URI must be set");
+    let google_client_id = env::var("GOOGLE_CLIENT_ID").expect("GOOGLE_CLIENT_ID must be set");
+    let google_client_secret = env::var("GOOGLE_CLIENT_SECRET").expect("GOOGLE_CLIENT_SECRET must be set");
+    let google_redirect_uri = env::var("GOOGLE_REDIRECT_URI").expect("GOOGLE_REDIRECT_URI must be set");
 
     let db = Database::new(&database_url).await.expect("Failed to connect to database");
 
@@ -59,11 +64,17 @@ async fn main() {
         github_client_secret,
         github_redirect_uri,
     ));
+    let google_oauth = Arc::new(GoogleOAuthClient::new(
+        google_client_id,
+        google_client_secret,
+        google_redirect_uri,
+    ));
 
     let state = AppState {
         user_repository,
         jwt_service,
         github_oauth,
+        google_oauth,
     };
 
     let api_routes = routes::api::create_router();

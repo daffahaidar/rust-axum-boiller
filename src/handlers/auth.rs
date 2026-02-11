@@ -2,7 +2,7 @@ use axum::{extract::{State, Query}, response::{IntoResponse, Redirect}, Json};
 use validator::Validate;
 use crate::infrastructure::errors::AppError;
 use crate::domain::dtos::RegisterUserDto;
-use crate::usecases::auth::{RegisterUseCase, LoginUseCase, RefreshTokenUseCase, GitHubCallbackUseCase};
+use crate::usecases::auth::{RegisterUseCase, LoginUseCase, RefreshTokenUseCase, GitHubCallbackUseCase, GoogleCallbackUseCase};
 use crate::utils::{response::success_response, validation::validate_request};
 use crate::AppState;
 
@@ -32,7 +32,7 @@ pub struct RefreshRequest {
 }
 
 #[derive(serde::Deserialize)]
-pub struct GitHubCallbackQuery {
+pub struct OAuthCallbackQuery {
     pub code: String,
 }
 
@@ -88,7 +88,7 @@ pub async fn github_login(
 /// Handles the GitHub OAuth callback
 pub async fn github_callback(
     State(state): State<AppState>,
-    Query(query): Query<GitHubCallbackQuery>,
+    Query(query): Query<OAuthCallbackQuery>,
 ) -> Result<impl IntoResponse, AppError> {
     let usecase = GitHubCallbackUseCase::new(
         state.user_repository.clone(),
@@ -99,4 +99,28 @@ pub async fn github_callback(
     let tokens = usecase.execute(&query.code).await?;
 
     Ok(success_response(tokens, "GitHub login successful"))
+}
+
+/// Redirects the user to Google's authorization page
+pub async fn google_login(
+    State(state): State<AppState>,
+) -> Redirect {
+    let authorize_url = state.google_oauth.get_authorize_url();
+    Redirect::temporary(&authorize_url)
+}
+
+/// Handles the Google OAuth callback
+pub async fn google_callback(
+    State(state): State<AppState>,
+    Query(query): Query<OAuthCallbackQuery>,
+) -> Result<impl IntoResponse, AppError> {
+    let usecase = GoogleCallbackUseCase::new(
+        state.user_repository.clone(),
+        state.jwt_service.clone(),
+        state.google_oauth.clone(),
+    );
+
+    let tokens = usecase.execute(&query.code).await?;
+
+    Ok(success_response(tokens, "Google login successful"))
 }

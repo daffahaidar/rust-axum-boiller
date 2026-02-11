@@ -34,6 +34,7 @@ impl<R: UserRepository> CreateUserUseCase<R> {
             role: dto.role,
             status: UserStatus::default(),
             github_id: None,
+            google_id: None,
             avatar_url: None,
             created_at: None,
             updated_at: None,

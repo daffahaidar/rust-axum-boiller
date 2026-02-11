@@ -1,8 +1,8 @@
-🌐 _Read this in: **English** | [Bahasa Indonesia](README.id.md)_
+🌐 \*Read this in: [English](README.md) | **Bahasa Indonesia\***
 
 # Rust Axum Authentication Service
 
-A backend REST API built with Rust + Axum using Clean Architecture. This service provides authentication and user management with JWT-based authentication and role-based access control (RBAC).
+Backend REST API menggunakan Rust + Axum dengan arsitektur Clean Architecture. Service ini menyediakan fitur authentication dan user management dengan JWT-based authentication dan role-based access control (RBAC).
 
 ## 🚀 Features
 
@@ -23,9 +23,9 @@ A backend REST API built with Rust + Axum using Clean Architecture. This service
 
 - **Rust** (latest stable) - [Install](https://rustup.rs/)
 - **PostgreSQL** 12+
-- **cargo-watch** (optional, for hot reload)
-- **GitHub OAuth App** (optional, for Login with GitHub)
-- **Google OAuth Client** (optional, for Login with Google)
+- **cargo-watch** (optional, untuk hot reload)
+- **GitHub OAuth App** (optional, untuk Login with GitHub)
+- **Google OAuth Client** (optional, untuk Login with Google)
 
 ## 🛠️ Setup Instructions
 
@@ -45,7 +45,7 @@ source $HOME/.cargo/env
 sudo apt update
 sudo apt install postgresql postgresql-contrib
 
-# MacOS (with Homebrew)
+# MacOS (dengan Homebrew)
 brew install postgresql@15
 brew services start postgresql@15
 ```
@@ -63,30 +63,30 @@ cp .env.example .env
 #### 4. Setup Database
 
 ```bash
-# Create database
+# Buat database
 createdb dimentorin
 
-# Edit .env with your database credentials
-nano .env  # or vim/code
+# Edit .env dengan kredensial database Anda
+nano .env  # atau vim/code
 ```
 
 #### 5. Install Dependencies (Optional)
 
 ```bash
-# For hot reload development
+# Untuk hot reload development
 cargo install cargo-watch
 ```
 
 #### 6. Run Project
 
 ```bash
-# Development with hot reload
+# Development dengan hot reload
 make dev
 
-# Or production
+# Atau production
 make start
 
-# Or manually
+# Atau manual
 cargo run --release
 ```
 
@@ -96,9 +96,9 @@ cargo run --release
 
 #### 1. Install Rust
 
-Download and install from [rustup.rs](https://rustup.rs/)
+Download dan install dari [rustup.rs](https://rustup.rs/)
 
-Or via PowerShell:
+Atau via PowerShell:
 
 ```powershell
 # Run as Administrator
@@ -109,9 +109,9 @@ iex ((New-Object System.Net.WebClient).DownloadString('https://win.rustup.rs'))
 
 #### 2. Install PostgreSQL
 
-Download from [postgresql.org](https://www.postgresql.org/download/windows/)
+Download dari [postgresql.org](https://www.postgresql.org/download/windows/)
 
-Or via Chocolatey:
+Atau via Chocolatey:
 
 ```powershell
 choco install postgresql
@@ -129,13 +129,13 @@ copy .env.example .env
 
 #### 4. Setup Database
 
-Open **pgAdmin** or **psql**:
+Buka **pgAdmin** atau **psql**:
 
 ```sql
 CREATE DATABASE dimentorin;
 ```
 
-Edit `.env` with a text editor (Notepad/VS Code):
+Edit `.env` dengan text editor (Notepad/VS Code):
 
 ```env
 DATABASE_URL=postgres://postgres:password@localhost:5432/dimentorin
@@ -152,36 +152,36 @@ cargo install cargo-watch
 #### 6. Run Project
 
 ```powershell
-# Development with hot reload
+# Development dengan hot reload
 cargo watch -c -x run
 
 # Production
 cargo run --release
 ```
 
-**Note for Windows:** `make` is not available by default. Use cargo commands directly or install [make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm)
+**Catatan Windows:** `make` tidak tersedia secara default. Gunakan command cargo langsung atau install [make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm)
 
 ---
 
 ### Setup OAuth Providers (Optional)
 
-To enable **Login with GitHub** and/or **Login with Google**, follow the steps below:
+Jika Anda ingin mengaktifkan fitur **Login with GitHub** dan/atau **Login with Google**, ikuti langkah-langkah berikut:
 
 #### 🐙 Setup GitHub OAuth
 
-1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
-2. Click **"New OAuth App"**
-3. Fill in the form:
+1. Buka [GitHub Developer Settings](https://github.com/settings/developers)
+2. Klik **"New OAuth App"**
+3. Isi form berikut:
 
    | Field                      | Value                                               |
    | -------------------------- | --------------------------------------------------- |
-   | Application name           | `Your App Name`                                     |
+   | Application name           | `Nama Aplikasi Anda`                                |
    | Homepage URL               | `http://localhost:8000`                             |
    | Authorization callback URL | `http://localhost:8000/api/v1/auth/github/callback` |
 
-4. Click **"Register application"**
-5. Copy the **Client ID** and generate a **Client Secret**
-6. Add to your `.env` file:
+4. Klik **"Register application"**
+5. Copy **Client ID** dan generate **Client Secret**
+6. Masukkan ke file `.env`:
 
    ```env
    GITHUB_CLIENT_ID=your_github_client_id
@@ -189,30 +189,30 @@ To enable **Login with GitHub** and/or **Login with Google**, follow the steps b
    GITHUB_REDIRECT_URI=http://localhost:8000/api/v1/auth/github/callback
    ```
 
-> **💡 Tip:** For production, replace all `localhost:8000` with your production domain.
+> **💡 Tip:** Untuk production, ganti semua `localhost:8000` dengan domain production Anda.
 
 #### 🔵 Setup Google OAuth
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select an existing one
-3. Navigate to **APIs & Services → Credentials**
-4. Click **"+ CREATE CREDENTIALS" → "OAuth client ID"**
-5. If not yet configured, set up the **OAuth consent screen** first:
+1. Buka [Google Cloud Console](https://console.cloud.google.com/)
+2. Buat project baru atau pilih project yang sudah ada
+3. Buka **APIs & Services → Credentials**
+4. Klik **"+ CREATE CREDENTIALS" → "OAuth client ID"**
+5. Jika belum, konfigurasi **OAuth consent screen** terlebih dahulu:
    - User Type: **External**
-   - Fill in the app name, support email, and developer email
-   - Add scopes: `email`, `profile`, `openid`
-   - Add test users (your email) if the status is still **Testing**
-6. Return to **Credentials** and create an OAuth client ID:
+   - Isi nama app, email support, dan email developer
+   - Tambahkan scopes: `email`, `profile`, `openid`
+   - Tambahkan test user (email Anda) jika status masih **Testing**
+6. Kembali ke **Credentials**, buat OAuth client ID:
 
    | Field                         | Value                                               |
    | ----------------------------- | --------------------------------------------------- |
    | Application type              | **Web application**                                 |
-   | Name                          | `Your App Name`                                     |
+   | Name                          | `Nama Aplikasi Anda`                                |
    | Authorized JavaScript origins | `http://localhost:8000`                             |
    | Authorized redirect URIs      | `http://localhost:8000/api/v1/auth/google/callback` |
 
-7. Click **"Create"** and copy the **Client ID** and **Client Secret**
-8. Add to your `.env` file:
+7. Klik **"Create"** dan copy **Client ID** dan **Client Secret**
+8. Masukkan ke file `.env`:
 
    ```env
    GOOGLE_CLIENT_ID=your_google_client_id
@@ -220,29 +220,29 @@ To enable **Login with GitHub** and/or **Login with Google**, follow the steps b
    GOOGLE_REDIRECT_URI=http://localhost:8000/api/v1/auth/google/callback
    ```
 
-> **⚠️ IMPORTANT:** If the OAuth consent screen is still in **Testing** mode, only emails registered as test users can log in. To allow all users, publish the app to **Production** in the consent screen settings.
+> **⚠️ PENTING:** Jika OAuth consent screen masih dalam status **Testing**, hanya email yang didaftarkan sebagai test user yang bisa login. Untuk membuka akses ke semua user, publish app ke **Production** di consent screen settings.
 
 ---
 
 ## 🔧 Development Commands
 
-### Using Make (Linux/MacOS)
+### Menggunakan Make (Linux/MacOS)
 
 ```bash
-make dev           # Development with hot reload
+make dev           # Development dengan hot reload
 make start         # Production server
 make build         # Build production binary
 make test          # Run tests
 make fmt           # Format code
 make check         # Check code
 make clean         # Clean build artifacts
-make help          # Show all commands
+make help          # Lihat semua commands
 ```
 
-### Without Make (All Platforms)
+### Tanpa Make (Semua Platform)
 
 ```bash
-# Development with hot reload
+# Development dengan hot reload
 cargo watch -c -x run
 
 # Production
@@ -263,39 +263,39 @@ cargo check
 
 ## 🌐 Environment Variables
 
-Edit the `.env` file:
+Edit file `.env`:
 
 ```env
 # Database
 DATABASE_URL=postgres://username:password@localhost:5432/dimentorin
 
-# JWT Secret (IMPORTANT: Change in production!)
+# JWT Secret (PENTING: Ganti di production!)
 JWT_SECRET=supersecretkeyShouldChangeInProduction
 
 # Logging Level
 RUST_LOG=debug
 
-# GitHub OAuth (for Login with GitHub)
+# GitHub OAuth (untuk Login with GitHub)
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
 GITHUB_REDIRECT_URI=http://localhost:8000/api/v1/auth/github/callback
 
-# Google OAuth (for Login with Google)
+# Google OAuth (untuk Login with Google)
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 GOOGLE_REDIRECT_URI=http://localhost:8000/api/v1/auth/google/callback
 ```
 
-**⚠️ SECURITY:** Do not commit the `.env` file to Git!
+**⚠️ SECURITY:** Jangan commit file `.env` ke Git!
 
 ## 🔐 User Roles
 
-| Role           | Description                                      |
-| -------------- | ------------------------------------------------ |
-| **User**       | Default role for new users                       |
-| **Mentor**     | Mentor role                                      |
-| **Admin**      | Can create users and suspend users               |
-| **SuperAdmin** | Full access - can edit, delete, and manage users |
+| Role           | Description                                             |
+| -------------- | ------------------------------------------------------- |
+| **User**       | Default role untuk user baru                            |
+| **Mentor**     | Mentor role                                             |
+| **Admin**      | Dapat membuat user dan suspend user                     |
+| **SuperAdmin** | Full access - dapat edit, delete, dan manage semua user |
 
 ## 📡 API Documentation
 
@@ -342,13 +342,15 @@ Content-Type: application/json
 
 ### GitHub OAuth Endpoints
 
+![alt text](image.png)
+
 #### 4. Login with GitHub
 
 ```bash
 GET /auth/github
 ```
 
-Redirect the user to this endpoint. The backend will redirect to GitHub's authorization page.
+Redirect user ke endpoint ini. Backend akan redirect ke halaman otorisasi GitHub.
 
 #### 5. GitHub Callback
 
@@ -356,7 +358,7 @@ Redirect the user to this endpoint. The backend will redirect to GitHub's author
 GET /auth/github/callback?code={authorization_code}
 ```
 
-Called automatically by GitHub after the user authorizes. Returns JWT tokens.
+Dipanggil otomatis oleh GitHub setelah user authorize. Mengembalikan JWT tokens.
 
 **Response:**
 
@@ -378,12 +380,12 @@ Called automatically by GitHub after the user authorizes. Returns JWT tokens.
 **OAuth Flow:**
 
 ```
-User → GET /auth/github → Redirect to GitHub → User authorizes
-→ GitHub redirects to /auth/github/callback?code=xxx
-→ Backend exchanges code → Fetches user info → Creates/links user → Returns JWT
+User → GET /auth/github → Redirect ke GitHub → User authorize
+→ GitHub redirect ke /auth/github/callback?code=xxx
+→ Backend exchange code → Fetch user info → Create/link user → Return JWT
 ```
 
-> **📝 Note:** If the GitHub email is already registered, the account will be automatically linked. OAuth users cannot log in via email/password.
+> **📝 Note:** Jika email GitHub sudah terdaftar, akun akan otomatis di-link. User OAuth tidak bisa login via email/password.
 
 ### Google OAuth Endpoints
 
@@ -393,7 +395,7 @@ User → GET /auth/github → Redirect to GitHub → User authorizes
 GET /auth/google
 ```
 
-Redirect the user to this endpoint. The backend will redirect to Google's login page.
+Redirect user ke endpoint ini. Backend akan redirect ke halaman login Google.
 
 #### 7. Google Callback
 
@@ -401,7 +403,7 @@ Redirect the user to this endpoint. The backend will redirect to Google's login 
 GET /auth/google/callback?code={authorization_code}
 ```
 
-Called automatically by Google after the user authorizes. Returns JWT tokens.
+Dipanggil otomatis oleh Google setelah user authorize. Mengembalikan JWT tokens.
 
 **Response:**
 
@@ -423,16 +425,16 @@ Called automatically by Google after the user authorizes. Returns JWT tokens.
 **OAuth Flow:**
 
 ```
-User → GET /auth/google → Redirect to Google → User logs in & authorizes
-→ Google redirects to /auth/google/callback?code=xxx
-→ Backend exchanges code → Fetches user info → Creates/links user → Returns JWT
+User → GET /auth/google → Redirect ke Google → User login & authorize
+→ Google redirect ke /auth/google/callback?code=xxx
+→ Backend exchange code → Fetch user info → Create/link user → Return JWT
 ```
 
-> **📝 Note:** Same as GitHub, if the Google email is already registered, the account will be automatically linked.
+> **📝 Note:** Sama seperti GitHub, jika email Google sudah terdaftar, akun akan otomatis di-link.
 
 ### User Management Endpoints
 
-> **⚠️ All endpoints below require an Authorization header**
+> **⚠️ Semua endpoint ini memerlukan Authorization header**
 
 #### 8. Get All Users (Admin, SuperAdmin)
 
@@ -478,7 +480,7 @@ DELETE /users/{id}
 Authorization: Bearer {access_token}
 ```
 
-**Note:** SuperAdmin cannot delete their own account.
+**Note:** SuperAdmin tidak bisa menghapus akun mereka sendiri.
 
 #### 12. Suspend/Activate User (Admin, SuperAdmin)
 
@@ -523,20 +525,20 @@ curl -X POST http://localhost:8000/api/v1/auth/sign-in \
 ### Login with GitHub
 
 ```bash
-# Open this URL in a browser (will redirect to GitHub)
+# Buka URL ini di browser (akan redirect ke GitHub)
 curl -v http://localhost:8000/api/v1/auth/github
 
-# Or open directly in a browser:
+# Atau langsung buka di browser:
 # http://localhost:8000/api/v1/auth/github
 ```
 
 ### Login with Google
 
 ```bash
-# Open this URL in a browser (will redirect to Google)
+# Buka URL ini di browser (akan redirect ke Google)
 curl -v http://localhost:8000/api/v1/auth/google
 
-# Or open directly in a browser:
+# Atau langsung buka di browser:
 # http://localhost:8000/api/v1/auth/google
 ```
 
@@ -561,7 +563,7 @@ curl -X GET http://localhost:8000/api/v1/users \
 | Delete User     | ❌   | ❌     | ❌    | ✅\*       |
 | Suspend User    | ❌   | ❌     | ✅    | ✅         |
 
-\*SuperAdmin cannot delete their own account
+\*SuperAdmin tidak dapat menghapus akun mereka sendiri
 
 ## 🏗️ Project Structure
 
@@ -593,7 +595,7 @@ rust-axum/
 ### Port Already in Use
 
 ```bash
-# Find process using port 8000
+# Cari process yang pakai port 8000
 lsof -i :8000
 
 # Kill process
@@ -603,7 +605,7 @@ pkill -f rust-axum
 ### Database Connection Error
 
 ```bash
-# Make sure PostgreSQL is running
+# Pastikan PostgreSQL running
 # MacOS
 brew services list
 
@@ -611,7 +613,7 @@ brew services list
 sudo systemctl status postgresql
 
 # Windows
-# Check in Services or pgAdmin
+# Check di Services atau pgAdmin
 ```
 
 ### cargo-watch Not Found

@@ -66,6 +66,7 @@ pub struct GitHubUserInfo {
 
 /// GitHub access token response
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 pub struct GitHubTokenResponse {
     pub access_token: String,
     pub token_type: String,
@@ -78,4 +79,26 @@ pub struct GitHubEmail {
     pub email: String,
     pub primary: bool,
     pub verified: bool,
+}
+
+/// Google access token response
+#[derive(Debug, Deserialize)]
+#[allow(dead_code)]
+pub struct GoogleTokenResponse {
+    pub access_token: String,
+    pub token_type: String,
+    pub expires_in: Option<u64>,
+    pub refresh_token: Option<String>,
+    pub scope: Option<String>,
+    pub id_token: Option<String>,
+}
+
+/// Google user info from userinfo endpoint
+#[derive(Debug, Deserialize)]
+pub struct GoogleUserInfo {
+    pub id: String,
+    pub email: Option<String>,
+    pub name: Option<String>,
+    pub picture: Option<String>,
+    pub verified_email: Option<bool>,
 }

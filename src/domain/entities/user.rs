@@ -35,6 +35,7 @@ pub struct User {
     pub role: Role,
     pub status: UserStatus,
     pub github_id: Option<i64>,
+    pub google_id: Option<String>,
     pub avatar_url: Option<String>,
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
