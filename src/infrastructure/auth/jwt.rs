@@ -13,6 +13,7 @@ pub struct Claims {
     pub email: String,
     pub phone: Option<String>,
     pub role: Role,
+    pub avatar_url: Option<String>,
     pub exp: usize,
     pub iat: usize,
     pub token_type: String, // "access" or "refresh"
@@ -39,6 +40,7 @@ impl JwtService {
             email: user.email.clone(),
             phone: user.phone.clone(),
             role: user.role.clone(),
+            avatar_url: user.avatar_url.clone(),
             exp: exp_access,
             iat,
             token_type: "access".to_string(),
@@ -57,6 +59,7 @@ impl JwtService {
             email: user.email.clone(),
             phone: user.phone.clone(),
             role: user.role.clone(),
+            avatar_url: user.avatar_url.clone(),
             exp: exp_refresh,
             iat,
             token_type: "refresh".to_string(),
